@@ -1,0 +1,31 @@
+{
+  "name": "js_filter",
+  "version": "1.0.0",
+  "description": "A browser library for filtering arrays of objects based on user defined filters",
+  "main": "index.js",
+  "scripts": {
+    "test": "mocha",
+    "build-debug": "browserify index.js -d --s Filterer > dist/js_filter.js",
+    "build-min": "browserify index.js --s Filterer | uglifyjs -c > dist/js_filter-min.js",
+    "build": "npm run build-debug && npm run build-min"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/chrissaretzky/js_filter.git"
+  },
+  "keywords": [
+    "filter",
+    "javascript",
+    "browser",
+    "json"
+  ],
+  "author": "Chris Saretzky",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/chrissaretzky/js_filter/issues"
+  },
+  "homepage": "https://github.com/chrissaretzky/js_filter#readme",
+  "devDependencies": {
+    "mocha": "^7.1.1"
+  }
+}
