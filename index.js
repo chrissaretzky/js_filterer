@@ -9,9 +9,9 @@
 
 function Filterer() {
   //The complete unfiltered data set
-  //Every function set in filters needs to accept this array as an argument
   this.complete_data = []
 
+  //@type {{name: Object.<function, string>}}
   this.filters = {}
 }
 /**
@@ -27,18 +27,39 @@ Filterer.prototype.set_complete_data = function(data) {}
 Filterer.prototype.get_complete_data = function() {}
 
 /**
-  * returns the array of complete data
-  * @returns {Array.Object}
+  * returns the filters object
+  * @returns {Object}
   */
 Filterer.prototype.get_filters = function() {}
-Filterer.prototype.remove_filter = function() {}
-Filterer.prototype.add_filter = function() {}
 
-Filterer.prototype.apply_filter = function() {}
+/**
+  * Removes the matching key from the filters object
+  * @param {String} the name of the filter you want removed
+  */
+Filterer.prototype.remove_filter = function(name) {}
+
+/**
+  * Removes the matching key from the filters object
+  * @param {String} the name of the filter you are adding
+  * @param {Function} the provided function accepts a two objects as
+  * arguments. One named data and the other named criteria. using
+  * the criteria the function determinens wether the data object passes
+  * if it passes the function returns true. The function must return a boolean
+  * @param {Object} the criteria used to filter the data objects
+  */
+Filterer.prototype.add_filter = function(name, fn, criteria) {}
+
+/**
+* Iterates through the complete data array, Applying only the specified filters
+* @param {String} the name of the filter you are Applying
+* @returns {Array} returns an array of the same type as the complete_data array
+*/
+Filterer.prototype.apply_filter = function(name) {}
+
+/**
+* Iterates through the complete data array, Applying all get_filters
+* @returns {Array} returns an array of the same type as the complete_data array
+*/
 Filterer.prototype.apply_filters = function() {}
-
-function Filter() {
-
-}
 
 module.exports = Filterer
