@@ -29,39 +29,67 @@ describe('Filterer', function(){
       })
       it('should have placed the array in complete_data', function(){
         filterer.set_complete_data(['test', 'test1'])
-        expect(filterer.complete_data.length).to.equal(2)
+        expect(filterer.complete_data).to.have.lengthOf(2)
       })
     })
   })
 
   describe('#get_complete_data()', function() {
     context('when complete data array is not null', function(){
-      it('should return an object of type array', function(){})
+      it('should return an object of type array', function(){
+        filterer.complete_data = ['test', 'test2']
+        expect(filterer.get_complete_data()).to.be.an.instanceof(Array)
+      })
     })
     context('when complete data array is null', function(){
-      it('should return null', function(){})
+      it('should return null', function(){
+        expect(filterer.get_complete_data()).to.be.empty
+      })
     })
   })
 
   describe('#get_filters()', function() {
-    context('when filters are null', function(){
-      it('should return null', function(){})
+    context('awhen filters are null', function(){
+      it('should return null', function(){
+        expect(filterer.get_filters()).to.be.empty
+      })
     })
     context('when filters are not null', function(){
-      it('should return the filters object', function(){})
+      it('should return the filters object', function(){
+        filterer.filters.test_filter = {fn: function(){}, criteria: 'test'}
+        expect(filterer.get_filters()).to.have.key('test_filter')
+      })
     })
   })
 
   describe('#remove_filter(name)', function() {
-    context('when name argument is null or not a string', function(){
-      it('should throw an error', function(){})
+    context('when name argument not a string', function(){
+      it('should throw an error', function(){
+        expect(filterer.remove_filter(null)).to.throw(
+          TypeError,
+          'Invalid filter name'
+        )
+      })
     })
     context('when name argument does not match a key in filters', function(){
-      it('should throw an error', function(){})
+      it('should throw an error', function(){
+        filterer.filters.test_filter = {fn: function(){}, criteria: 'test'}
+        expect(filterer.remove_filter('test')).to.throw(
+          TypeError,
+          'Invalid filter name'
+        )
+      })
     })
     context('when name argument matches a key in filters', function(){
-      it('should return the filter', function(){})
-      it('should remove the filter from the filters object', function(){})
+      it('should return the filter', function(){
+        filterer.filters.test_filter = {fn: function(){}, criteria: 'test'}
+        expect(filterer.remove_filter('test_filter')).to.have.keys('fn', 'criteria')
+      })
+      it('should remove the filter from the filters object', function(){
+        filterer.filters.test_filter = {fn: function(){}, criteria: 'test'}
+        filterer.remove_filter('test_filter')
+        expect(filterer.filters).to.not.have.key('test_filter')
+      })
     })
   })
 
