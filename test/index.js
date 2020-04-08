@@ -115,14 +115,34 @@ describe('Filterer', function(){
   })
 
   describe('#apply_filter(name)', function() {
-    context('when filter name is null or not a string', function(){
-      it('should throw error', function(){})
+    context('when filter name is null', function(){
+      it('should throw error', function(){
+        filterer.filters.test_filter = {fn: function(){}, criteria: 'test'}
+        expect(filterer.apply_filter('')).to.throw(
+          TypeError,
+          'Invalid filter name'
+        )
+      })
     })
     context('when filter name is not a key in the filter object', function(){
-      it('should throw error', function(){})
+      it('should throw error', function(){
+        filterer.complete_data = ['test1', 'test2']
+        filterer.filters.test_filter = {fn: function(){}, criteria: 'test'}
+        expect(filterer.apply_filter('filter_test')).to.throw(
+          TypeError,
+          'Invalid filter name'
+        )
+      })
     })
     context('when the complete_data array is empty', function(){
-      it('should throw error', function(){})
+      it('should throw error', function(){
+        filterer.complete_data = []
+        filterer.filters.test_filter = {fn: function(){}, criteria: 'test'}
+        expect(filterer.apply_filter('test_filter')).to.throw(
+          TypeError,
+          'complete_data array empty, provide data to be filtered'
+        )
+      })
     })
     context('when criteria argument is null', function(){
       it('should throw error', function(){})
