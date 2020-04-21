@@ -9,17 +9,17 @@ describe('Filterer', function(){
   describe('#set_complete_data()', function() {
     context('when array is null', function(){
       it('should throw error', function(){
-        expect(filterer.set_complete_data(null)).to.throw(
+        expect(() => {filterer.set_complete_data(null)}).to.throw(
           TypeError,
-          'Expects a data of array objects'
+          'Function expects an array'
         )
       })
     })
     context('when array is less than or equal to one', function(){
       it('should throw error', function(){
-        expect(filterer.set_complete_data(['test'])).to.throw(
-          TypeError,
-          'Array must have more than one object'
+        expect(() => {filterer.set_complete_data(['test'])}).to.throw(
+          Error,
+          'Array does not contain enough data to filter'
         )
       })
     })
@@ -49,7 +49,7 @@ describe('Filterer', function(){
   })
 
   describe('#get_filters()', function() {
-    context('awhen filters are null', function(){
+    context('when filters are null', function(){
       it('should return null', function(){
         expect(filterer.get_filters()).to.be.empty
       })
@@ -99,7 +99,7 @@ describe('Filterer', function(){
         expect(filterer.add_filter(
           '',
           function(data, criteria){return (data === criteria.name) ? true : false},
-          criteria: {name: 'test1'}
+          {criteria: {name: 'test1'}}
         )).to.throw(
           TypeError,
           'Invalid filter name'
@@ -111,7 +111,7 @@ describe('Filterer', function(){
         expect(filterer.add_filter(
           'test_filter',
           null,
-          criteria: {name: 'test1'}
+          {criteria: {name: 'test1'}}
         )).to.throw(
           TypeError,
           'Invalid function'
@@ -123,7 +123,7 @@ describe('Filterer', function(){
         expect(filterer.add_filter(
           'test_filter',
           function(data, criteria){return (data === criteria.name) ? true : false},
-          criteria: null
+          {criteria: null}
         )).to.throw(
           TypeError,
           'Invalid criteria'
@@ -135,7 +135,7 @@ describe('Filterer', function(){
         expect(filterer.add_filter(
           'test_filter',
           function(data, criteria){return (data === criteria.name) ? 1 : 0},
-          criteria: {name: 'test1'}
+          {criteria: {name: 'test1'}}
         )).to.throw(
           TypeError,
           'Submitted function must return a boolean value'
@@ -147,7 +147,7 @@ describe('Filterer', function(){
         expect(filterer.add_filter(
           'test_filter',
           function(criteria){return (criteria.name) ? true : false},
-          criteria: {name: 'test1'}
+          {criteria: {name: 'test1'}}
         )).to.throw(
           TypeError,
           'Submitted function must include 2 arguments'
@@ -159,7 +159,7 @@ describe('Filterer', function(){
         expect(filterer.add_filter(
           'test_filter',
           function(data, criteria){return (data === criteria.name) ? true : false},
-          criteria: {name: 'test1'}
+          {criteria: {name: 'test1'}}
         )).to.be.true
       })
     })
@@ -221,7 +221,7 @@ describe('Filterer', function(){
       it('should throw error', function(){
         filterer.complete_data = ['test1', 'test2']
         filterer.filters.test_filter = {
-          fn: function(data, criteria){return (data === criteria.name) true : false},
+          fn: function(data, criteria){return (data === criteria.name) ? true : false},
           criteria: {name: 'test1'}
         }
         expect(filterer.apply_filter('test_filter')).to.throw(
