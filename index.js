@@ -18,25 +18,42 @@ function Filterer() {
   * Sets the complete unfiltered data set_complete_data
   * @param {Array.Object} an array of objects the filters will be applied to
   */
-Filterer.prototype.set_complete_data = function(data) {}
+Filterer.prototype.set_complete_data = function(data) {
+  if(!Array.isArray(data))  throw new TypeError("Function expects an array")
+  if(data.length < 2)       throw new Error("Array does not contain enough data to filter")
+
+  this.complete_data = data
+  return true
+}
 
 /**
   * returns the array of complete data
   * @returns {Array.Object}
   */
-Filterer.prototype.get_complete_data = function() {}
+Filterer.prototype.get_complete_data = function() {
+  return this.complete_data
+}
 
 /**
   * returns the filters object
   * @returns {Object}
   */
-Filterer.prototype.get_filters = function() {}
+Filterer.prototype.get_filters = function() {
+  return this.filters
+}
 
 /**
   * Removes the matching key from the filters object
   * @param {String} the name of the filter you want removed
   */
-Filterer.prototype.remove_filter = function(name) {}
+Filterer.prototype.remove_filter = function(name) {
+  if(!this.filters[name])       throw new Error("Invalid filter name")
+  if(typeOf(name) !== 'string') throw new Error('Invalid filter name')
+
+  var filter = this.filters[name]
+  delete this.filters[name]
+  return filter
+}
 
 /**
   * Removes the matching key from the filters object
@@ -47,7 +64,11 @@ Filterer.prototype.remove_filter = function(name) {}
   * if it passes the function returns true. The function must return a boolean
   * @param {Object} the criteria used to filter the data objects
   */
-Filterer.prototype.add_filter = function(name, fn, criteria) {}
+Filterer.prototype.add_filter = function(name, fn, criteria) {
+  if(typeOf(name) !== 'string' || name = '') throw new Error('Invalid filter name')
+  if(typeOf(fn) !== 'function')              throw new Error('invalid function')
+  if(!criteria)                              throw new Error('Invalid criteria')
+}
 
 /**
 * Iterates through the complete data array, Applying only the specified filters
