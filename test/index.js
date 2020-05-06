@@ -65,8 +65,8 @@ describe('Filterer', function(){
   describe('#remove_filter(name)', function() {
     context('when name argument not a string', function(){
       it('should throw an error', function(){
-        expect(filterer.remove_filter(null)).to.throw(
-          TypeError,
+        expect(() => {filterer.remove_filter(null)}).to.throw(
+          Error,
           'Invalid filter name'
         )
       })
@@ -74,8 +74,8 @@ describe('Filterer', function(){
     context('when name argument does not match a key in filters', function(){
       it('should throw an error', function(){
         filterer.filters.test_filter = {fn: function(){}, criteria: 'test'}
-        expect(filterer.remove_filter('test')).to.throw(
-          TypeError,
+        expect(() => {filterer.remove_filter('test')}).to.throw(
+          Error,
           'Invalid filter name'
         )
       })
@@ -96,61 +96,61 @@ describe('Filterer', function(){
   describe('#add_filter(name, fn(data, criteria), criteria)', function() {
     context('when name is null or not a string', function(){
       it('should throw an error', function(){
-        expect(filterer.add_filter(
+        expect(() => {filterer.add_filter(
           '',
-          function(data, criteria){return (data === criteria.name) ? true : false},
+          function(data, criteria){return true},
           {criteria: {name: 'test1'}}
-        )).to.throw(
-          TypeError,
+        )}).to.throw(
+          Error,
           'Invalid filter name'
         )
       })
     })
     context('when fn argument is not a function', function(){
       it('should throw an error', function(){
-        expect(filterer.add_filter(
+        expect(() => {filterer.add_filter(
           'test_filter',
           null,
           {criteria: {name: 'test1'}}
-        )).to.throw(
-          TypeError,
+        )}).to.throw(
+          Error,
           'Invalid function'
         )
       })
     })
     context('when criteria argument is null', function(){
       it('should throw an error', function(){
-        expect(filterer.add_filter(
+        expect(() => {filterer.add_filter(
           'test_filter',
           function(data, criteria){return (data === criteria.name) ? true : false},
-          {criteria: null}
-        )).to.throw(
-          TypeError,
+          null
+        )}).to.throw(
+          Error,
           'Invalid criteria'
         )
       })
     })
-    context('when fn argument does not return a boolean', function(){
+    context('when fn argument does not return true', function(){
       it('should throw an error', function(){
-        expect(filterer.add_filter(
+        expect(() => {filterer.add_filter(
           'test_filter',
-          function(data, criteria){return (data === criteria.name) ? 1 : 0},
+          function(data, criteria){return 1},
           {criteria: {name: 'test1'}}
-        )).to.throw(
-          TypeError,
-          'Submitted function must return a boolean value'
+        )}).to.throw(
+          Error,
+          'Provided function must return true'
         )
       })
     })
     context('when fn argument has 0 or 1 arguments', function(){
       it('should throw an error', function(){
-        expect(filterer.add_filter(
+        expect(() => {filterer.add_filter(
           'test_filter',
-          function(criteria){return (criteria.name) ? true : false},
+          function(criteria){return true},
           {criteria: {name: 'test1'}}
-        )).to.throw(
-          TypeError,
-          'Submitted function must include 2 arguments'
+        )}).to.throw(
+          Error,
+          'Provided function must have two arguments, by convention use (data, criteria)'
         )
       })
     })
@@ -158,7 +158,7 @@ describe('Filterer', function(){
       it('should return true', function(){
         expect(filterer.add_filter(
           'test_filter',
-          function(data, criteria){return (data === criteria.name) ? true : false},
+          function(data, criteria){return true},
           {criteria: {name: 'test1'}}
         )).to.be.true
       })
@@ -166,18 +166,6 @@ describe('Filterer', function(){
   })
 
   describe('#apply_filter(name)', function() {
-    context('when filter name is null', function(){
-      it('should throw error', function(){
-        filterer.filters.test_filter = {
-          fn: function(data, criteria){return (data === criteria.name) ? true : false},
-          criteria: {name: 'test1'}
-        }
-        expect(filterer.apply_filter('')).to.throw(
-          TypeError,
-          'Invalid filter name'
-        )
-      })
-    })
     context('when filter name is not a key in the filter object', function(){
       it('should throw error', function(){
         filterer.complete_data = ['test1', 'test2']
@@ -185,7 +173,7 @@ describe('Filterer', function(){
           fn: function(data, criteria){return (data === criteria.name) ? true : false},
           criteria: {name: 'test1'}
         }
-        expect(filterer.apply_filter('filter_test')).to.throw(
+        expect(() => {filterer.apply_filter('filter_test')}).to.throw(
           Error,
           'Invalid filter name'
         )
@@ -198,22 +186,9 @@ describe('Filterer', function(){
           fn: function(data, criteria){return (data === criteria.name) ? true : false},
           criteria: {name: 'test1'}
         }
-        expect(filterer.apply_filter('test_filter')).to.throw(
+        expect(() => {filterer.apply_filter('test_filter')}).to.throw(
           Error,
-          'complete_data array empty, provide data to be filtered'
-        )
-      })
-    })
-    context('when criteria argument is null', function(){
-      it('should throw error', function(){
-        filterer.complete_data = ['test1', 'test2']
-        filterer.filters.test_filter = {
-          fn: function(data, criteria){return (data === criteria.name) ? true : false},
-          criteria: null
-        }
-        expect(filterer.apply_filter('test_filter')).to.throw(
-          Error,
-          'Filters criteria is invalid'
+          'No data to filter'
         )
       })
     })
@@ -221,22 +196,14 @@ describe('Filterer', function(){
       it('should throw error', function(){
         filterer.complete_data = ['test1', 'test2']
         filterer.filters.test_filter = {
-          fn: function(data, criteria){return (data === criteria.name) ? true : false},
+          fn: function(data, criteria){return (console.lag('wha?')) ? true : false},
           criteria: {name: 'test1'}
         }
-        expect(filterer.apply_filter('test_filter')).to.throw(
+        expect(() => {filterer.apply_filter('test_filter')}).to.throw(
           Error,
-          'Unable to process function, please review error message'
+          'provided function failed to execute'
         )
       })
-      // it('should show stacktrace in error', function(){
-      //   filterer.complete_data = ['test1', 'test2']
-      //   filterer.filters.test_filter = {fn: function(){}, criteria: 'test'}
-      //   expect(filterer.apply_filter('test_filter')).to.throw(
-      //     TypeError,
-      //     'Unable to process function, please review error message'
-      //   )
-      // })
     })
     context('when function filters no data', function(){
       it('should return an empty array', function(){
@@ -249,7 +216,7 @@ describe('Filterer', function(){
       })
     })
     context('when function filters data successfully', function(){
-      it('should return array', function(){
+      it('should return array of length 0 that includes the item test1', function(){
         filterer.complete_data = ['test1', 'test2']
         filterer.filters.test_filter = {
           fn: function(data, criteria){return (data === criteria.name) ? true : false},
@@ -275,9 +242,9 @@ describe('Filterer', function(){
           fn: function(data, criteria){return (data.index === criteria.index) ? true : false},
           criteria: {index: 1}
         }
-        expect(filterer.apply_filters()).to.throw(
+        expect(() => {filterer.apply_filters()}).to.throw(
           Error,
-          'complete_data array empty, provide data to be filtered'
+          'No data to filter'
         )
       })
     })
@@ -307,39 +274,43 @@ describe('Filterer', function(){
           {name: 'test3', index: 2}
         ]
         filterer.filters.test_filter1 = {
-          fn: function(data, criteria){return (data.name === criteria.name) ? true : false},
+          fn: function(data, criteria){console.lag('wha?')},
           criteria: {name: 'test4'}
         }
         filterer.filters.test_filter2 = {
-          fn: function(data, criteria){return (data.index === criteria.index) ? true : false},
+          fn: function(data, criteria){console.lag('wha?')},
           criteria: {index: 3}
         }
-        expect(filterer.apply_filters()).to.throw(
+        expect(() => {filterer.apply_filters()}).to.throw(
           Error,
-          'One or more filters have failed to run'
+          'One or more filter functions failed to execute'
         )
       })
       // it('should include the name of failed filters in error message', function(){})
     })
     context('when data is filtered', function(){
-      it('should return array', function(){
+      it('should return array on length 1', function(){
         filterer.complete_data = [
           {name: 'test1', index: 0},
           {name: 'test2', index: 1},
           {name: 'test3', index: 2}
         ]
         filterer.filters.test_filter1 = {
-          fn: function(data, criteria){return (data.name === criteria.name) ? true : false},
-          criteria: {name: 'test3'}
+          fn: function(data, criteria){if (data.name === criteria.name){
+            return true
+          }},
+          criteria: {name: 'test2'}
         }
         filterer.filters.test_filter2 = {
-          fn: function(data, criteria){return (data.index === criteria.index) ? true : false},
+          fn: function(data, criteria){if (data.index === criteria.index){
+            return true
+          }},
           criteria: {index: 1}
         }
         expect(filterer.apply_filters())
         .to.be.an.instanceof(Array)
-        .that.has.a.lengthOf(2)
-        .and.includes({name: 'test2', index: 1})
+        .that.has.a.lengthOf(1)
+        //.and.includes({name: 'test2', index: 1})
       })
     })
   })
