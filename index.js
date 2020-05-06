@@ -48,7 +48,7 @@ Filterer.prototype.get_filters = function() {
   */
 Filterer.prototype.remove_filter = function(name) {
   if(!this.filters[name])       throw new Error("Invalid filter name")
-  if(typeOf(name) !== 'string') throw new Error('Invalid filter name')
+  if(typeof(name) !== 'string') throw new Error('Invalid filter name')
 
   var filter = this.filters[name]
   delete this.filters[name]
@@ -65,9 +65,21 @@ Filterer.prototype.remove_filter = function(name) {
   * @param {Object} the criteria used to filter the data objects
   */
 Filterer.prototype.add_filter = function(name, fn, criteria) {
-  if(typeOf(name) !== 'string' || name = '') throw new Error('Invalid filter name')
-  if(typeOf(fn) !== 'function')              throw new Error('invalid function')
-  if(!criteria)                              throw new Error('Invalid criteria')
+  if(typeof(name) !== 'string' || name === '')
+    {throw new Error('Invalid filter name')}
+  if(typeof(fn) !== 'function')
+    {throw new Error('Invalid function')}
+  if(!criteria || typeof(criteria) === 'undefined')
+    {throw new Error('Invalid criteria')}
+  if(!fn.toString().match('(?<![\",\'])return true(?![\",\'])'))
+    {throw new Error('Provided function must return true')}
+  if(fn.toString().match('return (?![true, false])', "i"))
+    {throw new Error('Provided function must only return a boolean value')}
+  if(!fn.toString().match('\\([a-zA-z0-9]*,.[a-zA-z0-9]*\\)'))
+    {throw new Error('Provided function must have two arguments, by convention use (data, criteria)')}
+
+  this.filters[name] = {fn: fn, criteria: criteria}
+  return true
 }
 
 /**
@@ -75,12 +87,50 @@ Filterer.prototype.add_filter = function(name, fn, criteria) {
 * @param {String} the name of the filter you are Applying
 * @returns {Array} returns an array of the same type as the complete_data array
 */
-Filterer.prototype.apply_filter = function(name) {}
+Filterer.prototype.apply_filter = function(name) {
+  if (this.filters[name] === undefined)
+    {throw new Error('Invalid filter name')}
+  if (this.complete_data.length < 2)
+    {throw new Error('No data to filter')}
+
+  var filtered_array = []
+  this.get_complete_data().forEach((data) => {
+    try{
+      filter = this.filters[name]
+      if (filter.fn(data, filter.criteria)){
+        filtered_array.push(data)
+      }
+    }
+    catch(err){
+      throw new Error('provided function failed to execute' + err)
+    }
+  });
+  return filtered_array
+}
 
 /**
 * Iterates through the complete data array, Applying all get_filters
 * @returns {Array} returns an array of the same type as the complete_data array
 */
-Filterer.prototype.apply_filters = function() {}
+Filterer.prototype.apply_filters = function() {
+  if (this.complete_data.length < 2)
+    {throw new Error('No data to filter')}
+
+  var filtered_arry = []
+  this.get_complete_data().forEach((data) => {
+    var passed = true
+    try{
+      for(filter in this.get_filters()){
+        filter = this.filters[filter]
+        if(!filter.fn(data, filter.criteria)) passed = false
+      }
+    }
+    catch(err){
+      throw new Error('One or more filter functions failed to execute' + err)
+    }
+    if(passed) filtered_arry.push(data)
+  })
+  return filtered_arry
+}
 
 module.exports = Filterer
