@@ -26,7 +26,7 @@
   },
   "homepage": "https://github.com/chrissaretzky/js_filter#readme",
   "devDependencies": {
-    "mocha": "^7.1.1"
+    "mocha": "^10.2.0"
   },
   "dependencies": {
     "chai": "^4.2.0"
